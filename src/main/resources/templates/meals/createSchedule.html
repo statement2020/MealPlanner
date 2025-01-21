@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Schedule</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+    <div class="container">
+        <h2>Create Schedule</h2>
+        <form th:action="@{/meals/schedule}" th:object="${schedule}" method="post">
+            <div class="form-group">
+                <label for="day">Day</label>
+                <input type="text" class="form-control" id="day" th:field="*{day}" required>
+            </div>
+            <div class="form-group">
+                <label for="mealId">Meal</label>
+                <select class="form-control" id="mealId" th:field="*{mealId}">
+                    <option th:each="meal : ${meals}" th:value="${meal.id}" th:text="${meal.title}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Schedule</button>
+        </form>
+    </div>
+</body>
+</html>
