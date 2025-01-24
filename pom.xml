@@ -76,6 +76,90 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <classifier>exe</classifier>
+                    <finalName>
+                        ${project.artifactId}
+                    </finalName>
+                    <outputDirectory>src/main/docker</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.45.0</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <alias>asset-track</alias>
+                            <name>ghcr.io/mealplanner/menu-master:${project.version}</name>
+
+                            <build>
+                                <dockerFile>Dockerfile</dockerFile>
+                            </build>
+
+                            <run>
+                                <ports>
+                                    <port>8080:8080</port>
+                                </ports>
+                                <wait>
+                                    <http>
+                                        <url>http://localhost:8080/actuator</url>
+                                    </http>
+                                    <time>10000</time>
+                                </wait>
+                                <links>
+                                    <link>database:db</link>
+                                </links>
+                            </run>
+
+                            <copy>
+                                <entries>
+                                    <entry>
+                                        <containerPath>/etc/hosts</containerPath>
+                                        <hostDirectory>${project.build.directory}</hostDirectory>
+                                    </entry>
+                                </entries>
+                            </copy>
+                        </image>
+
+                        <image>
+                            <alias>database</alias>
+                            <name>postgres:9</name>
+                            <run>
+                                <wait>
+                                    <log>database system is ready to accept connections</log>
+                                    <time>20000</time>
+                                </wait>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>push</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Meal Plan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+<h1 class="text-center mb-4">Weekly Meal Plan</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form method="get" action="/meal-plans/mealplan">
+        <button class="btn btn-primary" type="submit" name="date" th:value="${{previousWeek}}">&laquo; Previous Week</button>
+    </form>
+    <form method="get" action="/meal-plans/mealplan">
+        <label for="date" class="form-label">Select Date:</label>
+        <input type="date" id="date" name="date" th:value="${{currentDate}}" required class="form-control d-inline-block w-auto">
+        <button class="btn btn-secondary mt-2" type="submit">Go</button>
+    </form>
+    <form method="get" action="/meal-plans/mealplan">
+        <button class="btn btn-primary" type="submit" name="date" th:value="${{nextWeek}}">Next Week &raquo;</button>
+    </form>
+</div>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Day</th>
+        <th>Meals</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="entry : ${weeklyMealPlan}">
+        <tr>
+            <td th:text="${entry.key}"></td>
+            <td>
+                <ul>
+                    <li th:each="meal : ${entry.value}">
+                        <span th:text="${meal.mealName}"></span> -
+                        <span>Macros: </span>
+                        <span th:text="'Protein: ' + ${meal.protein} + 'g, '"></span>
+                        <span th:text="'Carbs: ' + ${meal.carbs} + 'g, '"></span>
+                        <span th:text="'Fats: ' + ${meal.fats} + 'g'"></span>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </th:block>
+        </tbody>
+    </table>
+</body>
+</html>
