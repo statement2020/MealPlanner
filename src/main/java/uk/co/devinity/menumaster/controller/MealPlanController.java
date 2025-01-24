@@ -13,7 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/meal-plans")
@@ -30,6 +33,26 @@ public class MealPlanController {
         List<MealPlan> mealPlans = mealPlanService.getMealPlansForUser(email);
         model.addAttribute("mealPlans", mealPlans);
         return "meal-plans";
+
+    }
+
+    @GetMapping("/mealplan")
+    public String getWeeklyMealPlan(@RequestParam(value = "date", required = false) String dateParam,
+                                    Principal principal,
+                                    Model model) {
+        var email = getEmail(principal);
+
+        LocalDate selectedDate = (dateParam != null) ? LocalDate.parse(dateParam) : LocalDate.now();
+        LocalDate startOfWeek = selectedDate.with(WeekFields.of(Locale.getDefault()).getFirstDayOfWeek());
+
+        // Set dates for navigation
+        model.addAttribute("currentDate", selectedDate.toString());
+        model.addAttribute("previousWeek", startOfWeek.minusWeeks(1).toString());
+        model.addAttribute("nextWeek", startOfWeek.plusWeeks(1).toString());
+        LOG.info(model.toString());
+        model.addAttribute("weeklyMealPlan", mealPlanService.getWeeklyMealPlan(email, startOfWeek));
+
+        return "mealplan";
     }
 
     private String getEmail(final Principal principal) {
